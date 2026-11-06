@@ -1,0 +1,524 @@
+<title>Biotehnoloģijas kurss</title>
+<meta name="claude:viewport-fit-sides" content="cover">
+<link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Bricolage+Grotesque:opsz,wght@12..96,500;12..96,700&family=IBM+Plex+Sans:wght@400;500;600&family=IBM+Plex+Mono:wght@400;500&display=swap">
+<style>
+/* Layout: sticky chapter rail + one chapter at a time; rail collapses to a scrolling strip on phones */
+:root{
+  --bg:#EEF3F0; --surface:#FFFFFF; --fg:#11261F; --muted:#51675E; --line:#CFDCD5;
+  --accent:#0A7A6B; --on-accent:#FFFFFF; --accent-soft:#DDEFEA;
+  --hot:#B8266F; --hot-soft:#F6DCE9;
+  --ok:#1B7F3B; --ok-soft:#DCF0E2; --bad:#B3261E; --bad-soft:#F7DEDB;
+  --c-red:#D1453B; --c-green:#3E9B4F; --c-white:#C9D3CE; --c-blue:#2F78C4;
+  --font-display:"Bricolage Grotesque","Segoe UI",system-ui,sans-serif;
+  --font-body:"IBM Plex Sans","Segoe UI",system-ui,sans-serif;
+  --font-mono:"IBM Plex Mono",ui-monospace,Menlo,Consolas,monospace;
+}
+@media (prefers-color-scheme: dark){
+  :root:not([data-theme="light"]){
+    --bg:#0C1815; --surface:#12231F; --fg:#E4EFEA; --muted:#93AAA1; --line:#24403A;
+    --accent:#3FD1B8; --on-accent:#08201B; --accent-soft:#143A33;
+    --hot:#FF6FB1; --hot-soft:#3A1A2B;
+    --ok:#6FD58E; --ok-soft:#14301F; --bad:#FF8A80; --bad-soft:#3A1B19;
+    --c-red:#F0736A; --c-green:#6FCB7F; --c-white:#9FB0A8; --c-blue:#6AA9EE;
+    color-scheme:dark;
+  }
+}
+:root[data-theme="dark"]{
+  --bg:#0C1815; --surface:#12231F; --fg:#E4EFEA; --muted:#93AAA1; --line:#24403A;
+  --accent:#3FD1B8; --on-accent:#08201B; --accent-soft:#143A33;
+  --hot:#FF6FB1; --hot-soft:#3A1A2B;
+  --ok:#6FD58E; --ok-soft:#14301F; --bad:#FF8A80; --bad-soft:#3A1B19;
+  --c-red:#F0736A; --c-green:#6FCB7F; --c-white:#9FB0A8; --c-blue:#6AA9EE;
+  color-scheme:dark;
+}
+*{box-sizing:border-box}
+body{background:var(--bg);color:var(--fg);font-family:var(--font-body);font-size:16px;line-height:1.6;
+  padding-block:20px 48px;padding-left:max(16px,env(safe-area-inset-left,0px));padding-right:max(16px,env(safe-area-inset-right,0px))}
+.wrap{max-width:1080px;margin:0 auto}
+h1,h2,h3{font-family:var(--font-display);line-height:1.15;text-wrap:balance;margin:0}
+h1{font-size:clamp(1.9rem,5vw,2.9rem);font-weight:700;letter-spacing:-.01em}
+h2{font-size:clamp(1.5rem,3.4vw,2rem);font-weight:700}
+h3{font-size:1.1rem;font-weight:700}
+p{margin:0 0 1em;max-width:68ch}
+.eyebrow{font-family:var(--font-mono);font-size:.75rem;letter-spacing:.12em;text-transform:uppercase;color:var(--accent)}
+header.top{display:flex;flex-wrap:wrap;gap:16px 32px;align-items:flex-end;justify-content:space-between;padding-bottom:20px;border-bottom:2px solid var(--fg);margin-bottom:24px}
+header.top p{margin:8px 0 0;color:var(--muted)}
+.progress{min-width:200px}
+.progress .lbl{font-family:var(--font-mono);font-size:.78rem;color:var(--muted);display:flex;justify-content:space-between;gap:12px}
+.bar{height:8px;background:var(--line);border-radius:4px;margin-top:6px;overflow:hidden}
+.bar i{display:block;height:100%;width:0;background:var(--accent);transition:width .3s}
+.layout{display:grid;grid-template-columns:230px minmax(0,1fr);gap:32px;align-items:start}
+nav.rail{position:sticky;top:16px;display:flex;flex-direction:column;gap:4px}
+nav.rail a{display:flex;gap:10px;align-items:baseline;padding:9px 12px;border-radius:6px;color:var(--fg);text-decoration:none;font-weight:500;font-size:.95rem;border-left:3px solid transparent}
+nav.rail a .n{font-family:var(--font-mono);font-size:.78rem;color:var(--muted);min-width:1.4em}
+nav.rail a:hover{background:var(--accent-soft)}
+nav.rail a[aria-current="page"]{background:var(--surface);border-left-color:var(--accent);box-shadow:0 0 0 1px var(--line)}
+nav.rail a.done .n::after{content:" ✓";color:var(--ok)}
+nav.rail a.quiz{margin-top:8px;background:var(--accent);color:var(--on-accent)}
+nav.rail a.quiz .n{color:var(--on-accent)}
+nav.rail a.quiz[aria-current="page"]{box-shadow:0 0 0 2px var(--fg)}
+:focus-visible{outline:3px solid var(--hot);outline-offset:2px}
+main{min-width:0}
+.chapter{background:var(--surface);border:1px solid var(--line);border-radius:10px;padding:clamp(18px,3vw,36px)}
+.chapter>.eyebrow{margin-bottom:6px}
+.chapter+.chapter{margin-top:24px}
+[hidden]{display:none!important}
+.lead{font-size:1.1rem;margin:14px 0 20px}
+.chapter h3{margin:28px 0 10px}
+.key{background:var(--accent-soft);border-radius:8px;padding:14px 16px;margin:20px 0;max-width:68ch}
+.key b{font-family:var(--font-mono);font-size:.75rem;letter-spacing:.1em;text-transform:uppercase;color:var(--accent);display:block;margin-bottom:4px}
+.key p{margin:0}
+.lab{border:1px solid var(--line);border-radius:8px;padding:16px;margin:22px 0;background:var(--bg)}
+.lab>.eyebrow{display:block;margin-bottom:8px;color:var(--hot)}
+button{font:inherit;color:inherit;cursor:pointer}
+.btn{background:var(--accent);color:var(--on-accent);border:0;border-radius:6px;padding:10px 18px;font-weight:600}
+.btn:hover{filter:brightness(1.08)}
+.btn.ghost{background:transparent;color:var(--fg);border:1px solid var(--line)}
+.btn.ghost:hover{background:var(--accent-soft)}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.reveal-list{display:grid;gap:8px}
+.reveal{border:1px solid var(--line);border-radius:8px;background:var(--surface);overflow:hidden}
+.reveal>button{display:flex;width:100%;align-items:center;gap:12px;padding:12px 14px;background:none;border:0;text-align:left;font-weight:600}
+.reveal>button::after{content:"+";margin-left:auto;font-family:var(--font-mono);color:var(--accent);font-size:1.2rem}
+.reveal>button[aria-expanded="true"]::after{content:"–"}
+.reveal .panel{padding:0 14px 14px 14px}
+.reveal .panel p{margin:0;color:var(--fg)}
+.dot{width:14px;height:14px;border-radius:50%;flex:none;border:2px solid var(--fg)}
+.mono{font-family:var(--font-mono)}
+.seq{font-family:var(--font-mono);font-size:.95rem;overflow-x:auto;padding:12px;border:1px solid var(--line);border-radius:6px;background:var(--surface);white-space:nowrap}
+.pam{color:var(--hot);font-weight:500;background:var(--hot-soft);border-radius:3px;padding:0 2px}
+.sites{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:10px;margin:12px 0}
+.site{text-align:left;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:12px;display:grid;gap:6px;min-width:0}
+.site:hover{border-color:var(--accent)}
+.site .t{font-size:.8rem;color:var(--muted);font-family:var(--font-mono)}
+.site .seq{border:0;padding:0;background:none}
+.site.ok{border-color:var(--ok);background:var(--ok-soft)}
+.site.no{border-color:var(--bad);background:var(--bad-soft)}
+.fb{min-height:1.6em;margin:8px 0 0;max-width:68ch}
+.range-row{display:grid;grid-template-columns:minmax(0,1fr) auto;gap:12px;align-items:center}
+input[type=range]{width:100%;accent-color:var(--accent)}
+.big{font-family:var(--font-display);font-size:clamp(1.6rem,5vw,2.4rem);font-weight:700;color:var(--accent);font-variant-numeric:tabular-nums;word-break:break-all}
+.steps{display:grid;grid-template-columns:repeat(auto-fit,minmax(130px,1fr));gap:6px;margin-bottom:10px}
+.steps button{border:1px solid var(--line);background:var(--surface);border-radius:6px;padding:8px 10px;text-align:left;font-size:.88rem}
+.steps button .mono{display:block;font-size:.72rem;color:var(--muted)}
+.steps button[aria-pressed="true"]{border-color:var(--accent);background:var(--accent-soft)}
+.grid2{display:grid;grid-template-columns:repeat(auto-fit,minmax(260px,1fr));gap:12px}
+.card{border:1px solid var(--line);border-radius:8px;padding:14px;background:var(--surface)}
+.card h3{margin:0 0 6px}
+.card p{margin:0;font-size:.95rem}
+.phases{display:flex;flex-wrap:wrap;gap:6px;margin:8px 0}
+.phases button{border:1px solid var(--line);background:var(--surface);border-radius:999px;padding:6px 14px;font-size:.9rem}
+.phases button[aria-pressed="true"]{background:var(--accent);color:var(--on-accent);border-color:var(--accent)}
+svg.curve{width:100%;height:auto;max-width:640px;display:block}
+.pager{display:flex;flex-wrap:wrap;gap:10px;justify-content:space-between;margin-top:32px;padding-top:18px;border-top:1px solid var(--line)}
+table.t{border-collapse:collapse;width:100%;font-size:.93rem}
+.tw{overflow-x:auto}
+table.t th,table.t td{border-bottom:1px solid var(--line);padding:8px 10px;text-align:left;vertical-align:top}
+table.t th{font-family:var(--font-mono);font-size:.74rem;letter-spacing:.08em;text-transform:uppercase;color:var(--muted)}
+/* quiz */
+.qmeta{display:flex;justify-content:space-between;gap:12px;font-family:var(--font-mono);font-size:.8rem;color:var(--muted);margin:16px 0 8px}
+.qtext{font-family:var(--font-display);font-size:1.3rem;font-weight:500;margin:0 0 16px;max-width:60ch}
+.opts{display:grid;gap:8px;margin-bottom:12px}
+.opt{display:flex;gap:12px;text-align:left;width:100%;border:1px solid var(--line);background:var(--surface);border-radius:8px;padding:12px 14px}
+.opt:hover:not([disabled]){border-color:var(--accent)}
+.opt .k{font-family:var(--font-mono);color:var(--muted);flex:none}
+.opt.ok{border-color:var(--ok);background:var(--ok-soft)}
+.opt.no{border-color:var(--bad);background:var(--bad-soft)}
+.opt[disabled]{cursor:default}
+.expl{border-radius:8px;padding:12px 14px;margin-bottom:14px;background:var(--accent-soft);max-width:68ch}
+.score{font-family:var(--font-display);font-size:clamp(3rem,12vw,5rem);font-weight:700;line-height:1;color:var(--accent)}
+.review{display:flex;flex-wrap:wrap;gap:8px;margin:12px 0 20px}
+.review a{padding:6px 12px;border-radius:999px;background:var(--hot-soft);color:var(--fg);text-decoration:none;font-size:.9rem}
+@media (max-width:820px){
+  .layout{grid-template-columns:minmax(0,1fr);gap:16px}
+  nav.rail{position:static;flex-direction:row;overflow-x:auto;gap:6px;padding-bottom:6px}
+  nav.rail a{white-space:nowrap;border-left:0;border-bottom:3px solid transparent;flex:none}
+  nav.rail a[aria-current="page"]{border-bottom-color:var(--accent)}
+  nav.rail a.quiz{margin-top:0}
+}
+@media (prefers-reduced-motion:reduce){.bar i{transition:none}}
+</style>
+
+<div class="wrap">
+<header class="top">
+  <div>
+    <div class="eyebrow">Interaktīvs mācību materiāls</div>
+    <h1>Biotehnoloģija un bioinženierija</h1>
+    <p>Sešas nodaļas ar praktiskiem uzdevumiem un noslēguma tests ar 10 jautājumiem.</p>
+  </div>
+  <div class="progress" aria-live="polite">
+    <div class="lbl"><span>Apgūtās nodaļas</span><span id="plabel">0 / 6</span></div>
+    <div class="bar"><i id="pbar"></i></div>
+  </div>
+</header>
+
+<div class="layout">
+<nav class="rail" id="rail" aria-label="Nodaļas">
+  <a href="#n1" data-ch="n1"><span class="n">1</span>Kas ir biotehnoloģija</a>
+  <a href="#n2" data-ch="n2"><span class="n">2</span>Gēnu inženierija</a>
+  <a href="#n3" data-ch="n3"><span class="n">3</span>CRISPR-Cas9</a>
+  <a href="#n4" data-ch="n4"><span class="n">4</span>Šūnas un audi</a>
+  <a href="#n5" data-ch="n5"><span class="n">5</span>Rūpnieciskā biotehnoloģija</a>
+  <a href="#n6" data-ch="n6"><span class="n">6</span>Ētika un drošība</a>
+  <a href="#tests" class="quiz" data-ch="tests"><span class="n">★</span>Tests</a>
+</nav>
+
+<main id="main">
+
+<!-- 1 -->
+<section class="chapter" id="n1">
+  <div class="eyebrow">1. nodaļa</div>
+  <h2>Kas ir biotehnoloģija</h2>
+  <p class="lead">Biotehnoloģija izmanto dzīvus organismus, šūnas vai to daļas, lai iegūtu produktus un risinātu uzdevumus medicīnā, lauksaimniecībā un rūpniecībā.</p>
+  <p>Cilvēki to dara tūkstošiem gadu: maizes ceplis, alus un siers rodas, strādājot raugam un baktērijām. Mūsdienu biotehnoloģija atšķiras ar to, ka mēs varam mērķtiecīgi mainīt paša organisma DNS.</p>
+  <p><b>Bioinženierija</b> ir inženierzinātņu pieeja bioloģijai. Tā projektē un būvē ierīces un sistēmas, kas strādā ar dzīvām šūnām un audiem: mākslīgos orgānus, bioreaktorus, protēzes, diagnostikas ierīces.</p>
+  <div class="key"><b>Svarīgi</b><p>Biotehnoloģija atbild uz jautājumu, ko var iegūt no dzīviem organismiem. Bioinženierija atbild uz jautājumu, kā to uzbūvēt un uzturēt kā darbojošu sistēmu.</p></div>
+
+  <div class="lab">
+    <span class="eyebrow">Uzdevums · Biotehnoloģijas krāsu kodi</span>
+    <p>Nozares tradicionāli iedala pēc krāsām. Atver katru, lai redzētu piemērus.</p>
+    <div class="reveal-list">
+      <div class="reveal"><button type="button" aria-expanded="false"><span class="dot" style="background:var(--c-red)"></span>Sarkanā · medicīna</button><div class="panel"><p>Zāles, vakcīnas, diagnostika, gēnu terapija. Piemērs: rekombinantais cilvēka insulīns un mRNS vakcīnas.</p></div></div>
+      <div class="reveal"><button type="button" aria-expanded="false"><span class="dot" style="background:var(--c-green)"></span>Zaļā · lauksaimniecība</button><div class="panel"><p>Kultūraugi ar izmainītām īpašībām, bioloģiskā augu aizsardzība, mikroorganismu preparāti augsnei. Piemērs: kukaiņiem izturīgi kukurūzas hibrīdi.</p></div></div>
+      <div class="reveal"><button type="button" aria-expanded="false"><span class="dot" style="background:var(--c-white)"></span>Baltā · rūpniecība</button><div class="panel"><p>Fermentācija un enzīmi ražošanā: biodegviela, bioplastmasas, veļas pulveru enzīmi, vitamīni, pārtikas piedevas.</p></div></div>
+      <div class="reveal"><button type="button" aria-expanded="false"><span class="dot" style="background:var(--c-blue)"></span>Zilā · jūra un ūdens</button><div class="panel"><p>Jūras organismu izmantošana: aļģu produkti, akvakultūra, jūras mikroorganismu enzīmi un aktīvās vielas.</p></div></div>
+    </div>
+  </div>
+
+  <h3>Svarīgi pagrieziena punkti</h3>
+  <div class="tw"><table class="t">
+    <tr><th>Gads</th><th>Notikums</th></tr>
+    <tr><td class="mono">~1970. gadi</td><td>Tiek izstrādātas rekombinantās DNS metodes: DNS var griezt un savienot no dažādiem organismiem.</td></tr>
+    <tr><td class="mono">1982</td><td>Tirgū nonāk pirmais rekombinantais cilvēka insulīns, ko ražo baktērijas.</td></tr>
+    <tr><td class="mono">1983–1985</td><td>Izstrādā PCR metodi, kas ļauj miljoniem reižu pavairot noteiktu DNS fragmentu.</td></tr>
+    <tr><td class="mono">2012</td><td>Parāda, ka CRISPR-Cas9 var izmantot kā programmējamu gēnu “šķēres”.</td></tr>
+  </table></div>
+  <div class="pager"><span></span><span><button class="btn ghost done-btn" type="button" data-done="n1">Atzīmēt kā apgūtu</button> <a class="btn" href="#n2" style="text-decoration:none;display:inline-block">Tālāk →</a></span></div>
+</section>
+
+<!-- 2 -->
+<section class="chapter" id="n2">
+  <div class="eyebrow">2. nodaļa</div>
+  <h2>Gēnu inženierija</h2>
+  <p class="lead">Gēnu inženierija ir mērķtiecīga organisma DNS maiņa: gēna pievienošana, izņemšana vai pārrakstīšana.</p>
+  <p>Gēns ir DNS posms, kas nosaka, kā šūna veido noteiktu olbaltumvielu. Ja baktērijai ievada cilvēka insulīna gēnu, tā sāk ražot cilvēka insulīnu.</p>
+  <h3>Pamata rīki</h3>
+  <p><b>Restrikcijas enzīmi</b> ir „molekulārās šķēres”, kas pārgriež DNS noteiktā secībā. <b>DNS ligāze</b> ir „līme”, kas savieno DNS gabalus. <b>Plazmīda</b> ir neliels apļveida DNS gabals baktērijā, ko izmanto kā transportlīdzekli (vektoru) gēna ievadīšanai.</p>
+
+  <div class="lab">
+    <span class="eyebrow">Uzdevums · Gēna klonēšana soli pa solim</span>
+    <p>Izvēlies katru soli, lai redzētu, kas notiek.</p>
+    <div class="steps" id="cloneSteps"></div>
+    <p id="cloneInfo" style="margin:0"></p>
+  </div>
+
+  <h3>PCR: DNS kopēšana</h3>
+  <p>Polimerāzes ķēdes reakcija (PCR) atkārtoti karsē un dzesē paraugu. Katrā ciklā mērķa DNS fragmentu skaits teorētiski dubultojas.</p>
+  <div class="lab">
+    <span class="eyebrow">Uzdevums · PCR kalkulators</span>
+    <label for="pcr">Ciklu skaits: <b id="pcrN">25</b></label>
+    <div class="range-row"><input type="range" id="pcr" min="0" max="35" value="25"><span class="mono" id="pcrT"></span></div>
+    <p style="margin:12px 0 4px;color:var(--muted)">Kopiju skaits no vienas sākotnējās molekulas (ideālā gadījumā):</p>
+    <div class="big" id="pcrOut"></div>
+    <p style="margin:8px 0 0;color:var(--muted);font-size:.92rem">Praksē efektivitāte ir zemāka par 100 %, tāpēc reālais skaits ir mazāks. Parasti veic 25–35 ciklus.</p>
+  </div>
+  <div class="key"><b>Piemērs</b><p>Cilvēka insulīnu mūsdienās ražo baktērijas vai rauga šūnas, kurām ievadīts cilvēka insulīna gēns. Agrāk to ieguva no dzīvnieku aizkuņģa dziedzeriem.</p></div>
+  <div class="pager"><a class="btn ghost" href="#n1" style="text-decoration:none">← Atpakaļ</a><span><button class="btn ghost done-btn" type="button" data-done="n2">Atzīmēt kā apgūtu</button> <a class="btn" href="#n3" style="text-decoration:none;display:inline-block">Tālāk →</a></span></div>
+</section>
+
+<!-- 3 -->
+<section class="chapter" id="n3">
+  <div class="eyebrow">3. nodaļa</div>
+  <h2>CRISPR-Cas9</h2>
+  <p class="lead">CRISPR-Cas9 ir programmējama sistēma, kas atrod konkrētu vietu DNS un to pārgriež.</p>
+  <p>Sistēmai ir divas daļas. <b>Cas9</b> ir enzīms, kas griež DNS. <b>Vadošā RNS</b> (guide RNA) ir apmēram 20 nukleotīdu gara secība, kas Cas9 aizved uz mērķi, jo tā atbilst mērķa DNS secībai.</p>
+  <p>Cas9 griež tikai tad, ja mērķim blakus atrodas īss atpazīšanas signāls, ko sauc par <b>PAM</b>. Biežāk lietotajam Cas9 no <i>Streptococcus pyogenes</i> tas ir NGG (N ir jebkurš nukleotīds). Griezums notiek apmēram trīs nukleotīdus pirms PAM.</p>
+
+  <div class="lab">
+    <span class="eyebrow">Uzdevums · Atrodi derīgo mērķi</span>
+    <p>Katram variantam ir 20 nukleotīdu mērķa secība un tai sekojošie trīs nukleotīdi. Kurā vietā Cas9 var griezt?</p>
+    <div class="sites" id="sites">
+      <button type="button" class="site" data-ok="0"><span class="t">Vieta A</span><span class="seq">5′-GACCTGAAGTCCGATTACGA<b>CTA</b>-3′</span></button>
+      <button type="button" class="site" data-ok="1"><span class="t">Vieta B</span><span class="seq">5′-TTGCAGGCTAACGTCCATGA<b>TGG</b>-3′</span></button>
+    </div>
+    <p class="fb" id="siteFb" aria-live="polite"></p>
+  </div>
+
+  <h3>Kas notiek pēc griezuma</h3>
+  <div class="grid2">
+    <div class="card"><h3>NHEJ</h3><p>Šūna ātri salāpa pārrāvumu, bieži kļūdoties. Gēns parasti tiek izslēgts. To izmanto, ja gēnu vajag „izņemt no darba”.</p></div>
+    <div class="card"><h3>HDR</h3><p>Šūna izmanto piegādātu DNS veidni, lai pārrāvumu salabotu precīzi. Tā var ievietot vai izlabot noteiktu secību, taču tas notiek retāk.</p></div>
+  </div>
+  <div class="key"><b>Klīniskais piemērs</b><p>2023. gadā Lielbritānijā un ASV apstiprināja pirmo CRISPR terapiju (Casgevy) sirpjveida šūnu slimības un beta talasēmijas ārstēšanai.</p></div>
+  <div class="pager"><a class="btn ghost" href="#n2" style="text-decoration:none">← Atpakaļ</a><span><button class="btn ghost done-btn" type="button" data-done="n3">Atzīmēt kā apgūtu</button> <a class="btn" href="#n4" style="text-decoration:none;display:inline-block">Tālāk →</a></span></div>
+</section>
+
+<!-- 4 -->
+<section class="chapter" id="n4">
+  <div class="eyebrow">4. nodaļa</div>
+  <h2>Šūnu un audu inženierija</h2>
+  <p class="lead">Šūnu un audu inženierija audzē un pārveido dzīvas šūnas, lai aizstātu vai atjaunotu bojātus audus.</p>
+  <p>Mērķis ir iegūt funkcionālus audus: ādu, skrimšļus, asinsvadus, vēlāk arī sarežģītākus orgānus. Parasti vajag trīs sastāvdaļas: šūnas, nesējmateriālu (karkasu) un augšanas signālus.</p>
+
+  <div class="lab">
+    <span class="eyebrow">Uzdevums · Pamatjēdzieni</span>
+    <div class="reveal-list">
+      <div class="reveal"><button type="button" aria-expanded="false">Cilmes šūnas</button><div class="panel"><p>Šūnas, kas var dalīties un pārtapt dažādos šūnu tipos. Daži veidi dod tikai noteiktus šūnu tipus, citi gandrīz jebkuru.</p></div></div>
+      <div class="reveal"><button type="button" aria-expanded="false">iPSC (inducētās pluripotentās šūnas)</button><div class="panel"><p>Pieaugušas, piemēram, ādas šūnas, ko ar noteiktiem gēniem pārprogrammē atpakaļ pluripotentā stāvoklī. 2006. gadā to pirmoreiz paveica Šinjā Jamanaka grupa. Šūnas ir paša pacienta, tāpēc audu noraidīšanas risks ir mazāks.</p></div></div>
+      <div class="reveal"><button type="button" aria-expanded="false">Karkass (scaffold)</button><div class="panel"><p>Trīsdimensiju struktūra, uz kuras šūnas aug un veido audus. To var veidot no bioloģiski noārdāmiem materiāliem.</p></div></div>
+      <div class="reveal"><button type="button" aria-expanded="false">3D biodruka</button><div class="panel"><p>Slāni pa slānim izdrukā šūnu un materiāla maisījumu („biotinti”), lai izveidotu audu struktūru.</p></div></div>
+      <div class="reveal"><button type="button" aria-expanded="false">mRNS tehnoloģija</button><div class="panel"><p>Šūnai piegādā instrukciju olbaltumvielas veidošanai. Tā tiek izmantota vakcīnās pret COVID-19 un tiek pētīta citām slimībām.</p></div></div>
+      <div class="reveal"><button type="button" aria-expanded="false">Sintētiskā bioloģija</button><div class="panel"><p>Bioloģisku sistēmu projektēšana no standarta „detaļām”: gēnu shēmām, kas liek šūnai izjust vidi un atbildēt uz to, piemēram, ražot vielu vai signalizēt par slimību.</p></div></div>
+    </div>
+  </div>
+  <div class="key"><b>Izaicinājums</b><p>Visgrūtāk ir izveidot biezus audus ar asinsvadiem, jo šūnām dziļāk par aptuveni 100–200 μm no asinsvada trūkst skābekļa.</p></div>
+  <div class="pager"><a class="btn ghost" href="#n3" style="text-decoration:none">← Atpakaļ</a><span><button class="btn ghost done-btn" type="button" data-done="n4">Atzīmēt kā apgūtu</button> <a class="btn" href="#n5" style="text-decoration:none;display:inline-block">Tālāk →</a></span></div>
+</section>
+
+<!-- 5 -->
+<section class="chapter" id="n5">
+  <div class="eyebrow">5. nodaļa</div>
+  <h2>Rūpnieciskā biotehnoloģija</h2>
+  <p class="lead">Rūpniecībā mikroorganismus audzē lielos traukos, kurus sauc par bioreaktoriem jeb fermentoriem, un iegūst no tiem vēlamo produktu.</p>
+  <p>Ražotājs izvēlas organismu (baktērijas, rauga vai zīdītāju šūnas), baro to ar barotni un uztur piemērotus apstākļus. Tos parasti uzrauga automātiski: temperatūru, pH, šķīdinātā skābekļa daudzumu un maisīšanu. Tie ietekmē šūnu augšanu un produkta iznākumu.</p>
+  <p>Ar fermentāciju ražo antibiotikas, vitamīnus, aminoskābes, organiskās skābes, enzīmus, bioetanolu un terapeitiskos proteīnus.</p>
+
+  <div class="lab">
+    <span class="eyebrow">Uzdevums · Mikroorganismu augšanas līkne</span>
+    <p>Izvēlies fāzi, lai to izceltu grafikā. Līkne ir shematiska.</p>
+    <div class="phases" id="phases"></div>
+    <svg class="curve" viewBox="0 0 600 250" role="img" aria-label="Mikroorganismu augšanas līkne ar četrām fāzēm">
+      <rect id="ph-lag" x="40" y="20" width="100" height="190" fill="var(--hot-soft)" opacity="0"/>
+      <rect id="ph-log" x="140" y="20" width="160" height="190" fill="var(--hot-soft)" opacity="0"/>
+      <rect id="ph-sta" x="300" y="20" width="140" height="190" fill="var(--hot-soft)" opacity="0"/>
+      <rect id="ph-dea" x="440" y="20" width="120" height="190" fill="var(--hot-soft)" opacity="0"/>
+      <line x1="40" y1="210" x2="570" y2="210" stroke="var(--muted)" stroke-width="1.5"/>
+      <line x1="40" y1="20" x2="40" y2="210" stroke="var(--muted)" stroke-width="1.5"/>
+      <path d="M40 195 C100 195 120 192 140 185 C190 165 250 60 300 50 C340 44 400 44 440 46 C490 50 530 100 560 150" fill="none" stroke="var(--accent)" stroke-width="3.5"/>
+      <text x="305" y="238" text-anchor="middle" font-size="13" fill="var(--muted)" font-family="IBM Plex Mono, monospace">Laiks</text>
+      <text x="14" y="115" text-anchor="middle" font-size="13" fill="var(--muted)" font-family="IBM Plex Mono, monospace" transform="rotate(-90 14 115)">Dzīvo šūnu skaits (log)</text>
+    </svg>
+    <p class="fb" id="phaseInfo" aria-live="polite"></p>
+  </div>
+
+  <h3>Kur to izmanto</h3>
+  <div class="grid2">
+    <div class="card"><h3>Enzīmi</h3><p>Veļas pulveros, maizes cepšanā, sulu dzidrināšanā un citur. Enzīmi ļauj procesiem noritēt pie zemākas temperatūras.</p></div>
+    <div class="card"><h3>Biodegviela</h3><p>Bioetanolu iegūst, fermentējot cukurus ar raugu. Tas samazina atkarību no fosilās degvielas.</p></div>
+    <div class="card"><h3>Bioplastmasas</h3><p>Daži mikroorganismi uzkrāj polimērus, no kuriem var izgatavot bioloģiski noārdāmus materiālus.</p></div>
+    <div class="card"><h3>Biofarmācija</h3><p>Antivielas un hormoni, ko ražo kultivētas šūnas bioreaktoros ar stingru kvalitātes kontroli.</p></div>
+  </div>
+  <div class="pager"><a class="btn ghost" href="#n4" style="text-decoration:none">← Atpakaļ</a><span><button class="btn ghost done-btn" type="button" data-done="n5">Atzīmēt kā apgūtu</button> <a class="btn" href="#n6" style="text-decoration:none;display:inline-block">Tālāk →</a></span></div>
+</section>
+
+<!-- 6 -->
+<section class="chapter" id="n6">
+  <div class="eyebrow">6. nodaļa</div>
+  <h2>Ētika un drošība</h2>
+  <p class="lead">Jo spēcīgāks ir rīks, jo svarīgāk ir apspriest, kā to lietot un kas par to atbild.</p>
+  <p>Ģenētiskās izmaiņas var būt <b>somatiskas</b> (skar tikai pacienta ķermeņa šūnas un netiek mantotas) vai <b>dzimumšūnu</b> (skar olšūnas, spermu vai embrijus, tāpēc izmaiņas var nodoties pēcnācējiem). Šī atšķirība ir centrāla ētikas diskusijās.</p>
+
+  <div class="lab">
+    <span class="eyebrow">Uzdevums · Kur novilkt robežu</span>
+    <p>Atver katru situāciju un izlasi, kādi ir galvenie argumenti.</p>
+    <div class="reveal-list">
+      <div class="reveal"><button type="button" aria-expanded="false">Somatiskā gēnu terapija smagas slimības ārstēšanai</button><div class="panel"><p>Plaši atbalstīta, ja ieguvums pārsniedz risku un pacients sniedz informētu piekrišanu. Galvenie jautājumi: drošība, izmaksas un pieejamība.</p></div></div>
+      <div class="reveal"><button type="button" aria-expanded="false">Dzimumšūnu un embriju rediģēšana</button><div class="panel"><p>2018. gadā Ķīnā ziņots par ar CRISPR rediģētu bērnu dzimšanu, un tas izraisīja asu starptautisku nosodījumu. Galvenie iebildumi: mantojamas izmaiņas nākamajām paaudzēm, neprecīza rediģēšana un nepietiekama drošības pārbaude.</p></div></div>
+      <div class="reveal"><button type="button" aria-expanded="false">Ģenētiski modificētie (GMO) kultūraugi</button><div class="panel"><p>Atbalstītāji norāda uz izturību pret kaitēkļiem un mazāku ķimikāliju lietošanu. Skeptiķi norāda uz ietekmi uz vidi, bioloģisko daudzveidību un uzņēmumu kontroli pār sēklām. Eiropas Savienībā GMO ir īpaši regulēti, ar apstiprināšanu un marķēšanu.</p></div></div>
+      <div class="reveal"><button type="button" aria-expanded="false">Ģenētiskie dati un privātums</button><div class="panel"><p>DNS dati ir ļoti personiski un atklāj informāciju arī par radiniekiem. Jāapspriež, kam tie pieder, kā tiek glabāti un vai tos var izmantot, piemēram, apdrošināšanā vai darbā.</p></div></div>
+    </div>
+  </div>
+
+  <h3>Drošības principi laboratorijā</h3>
+  <p>Darbs ar modificētiem organismiem notiek pēc biodrošības līmeņiem (BSL-1 līdz BSL-4), kas nosaka telpas, aizsargtērpus un atkritumu apstrādi. Pētījumus uzrauga ētikas komitejas un valsts iestādes.</p>
+  <div class="key"><b>Atceries</b><p>Zinātne var pateikt, ko var izdarīt. Sabiedrība kopā ar speciālistiem lemj, ko vajadzētu darīt.</p></div>
+  <div class="pager"><a class="btn ghost" href="#n5" style="text-decoration:none">← Atpakaļ</a><span><button class="btn ghost done-btn" type="button" data-done="n6">Atzīmēt kā apgūtu</button> <a class="btn" href="#tests" style="text-decoration:none;display:inline-block">Uz testu →</a></span></div>
+</section>
+
+<!-- quiz -->
+<section class="chapter" id="tests">
+  <div class="eyebrow">Noslēguma tests</div>
+  <h2>Pārbaudi savas zināšanas</h2>
+  <div id="quizRoot"><p>Testam ir nepieciešams JavaScript. Ja šo tekstu redzi, atver lapu publicētā skatā vai pārlūkprogrammā.</p></div>
+</section>
+
+</main>
+</div>
+</div>
+
+<script>
+(function(){
+  var chapters=["n1","n2","n3","n4","n5","n6","tests"];
+  var done={};
+  try{ done=JSON.parse(localStorage.getItem("biotech-done")||"{}"); }catch(e){}
+  function saveDone(){ try{ localStorage.setItem("biotech-done",JSON.stringify(done)); }catch(e){} }
+
+  function updateProgress(){
+    var n=0; for(var i=1;i<=6;i++){ if(done["n"+i]) n++; }
+    document.getElementById("plabel").textContent=n+" / 6";
+    document.getElementById("pbar").style.width=(n/6*100)+"%";
+    document.querySelectorAll("#rail a").forEach(function(a){ a.classList.toggle("done",!!done[a.dataset.ch]); });
+    document.querySelectorAll(".done-btn").forEach(function(b){
+      var d=!!done[b.dataset.done]; b.textContent=d?"Apgūta ✓":"Atzīmēt kā apgūtu"; b.setAttribute("aria-pressed",d);
+    });
+  }
+  document.querySelectorAll(".done-btn").forEach(function(b){
+    b.addEventListener("click",function(){ var k=b.dataset.done; done[k]=!done[k]; saveDone(); updateProgress(); });
+  });
+
+  function show(h){
+    if(chapters.indexOf(h)<0) h="n1";
+    chapters.forEach(function(c){ document.getElementById(c).hidden=(c!==h); });
+    document.querySelectorAll("#rail a").forEach(function(a){
+      if(a.dataset.ch===h) a.setAttribute("aria-current","page"); else a.removeAttribute("aria-current");
+    });
+    if(h==="tests" && !quizStarted) startQuiz();
+    try{ window.scrollTo(0,0); document.getElementById("main").scrollIntoView(); }catch(e){}
+  }
+  /* Navigation runs in the page itself, so it also works when embedded (e.g. Google Sites) */
+  document.addEventListener("click",function(ev){
+    var a=ev.target.closest&&ev.target.closest('a[href^="#"]');
+    if(!a) return;
+    ev.preventDefault();
+    show(a.getAttribute("href").replace("#",""));
+  });
+
+  /* reveal panels: content stays visible if scripts fail; collapsed here */
+  document.querySelectorAll(".reveal>button").forEach(function(b){
+    b.nextElementSibling.hidden=true;
+    b.addEventListener("click",function(){
+      var p=b.nextElementSibling, open=b.getAttribute("aria-expanded")==="true";
+      b.setAttribute("aria-expanded",!open); p.hidden=open;
+    });
+  });
+
+  /* cloning stepper */
+  var steps=[
+    ["Izolē","Izdala vēlamo gēnu (piemēram, cilvēka insulīna gēnu) un sagatavo plazmīdu."],
+    ["Griež","Gan gēnu, gan plazmīdu pārgriež ar to pašu restrikcijas enzīmu, lai gali būtu savietojami."],
+    ["Savieno","DNS ligāze savieno gēnu ar plazmīdu. Rodas rekombinantā plazmīda."],
+    ["Ievada","Plazmīdu ievada baktērijā vai raugā. Šo soli sauc par transformāciju."],
+    ["Atlasa","Šūnas audzē uz barotnes ar antibiotiku. Izdzīvo tās, kuras ieguvušas plazmīdu ar rezistences gēnu. Tās pavairo un ražo vajadzīgo olbaltumvielu."]
+  ];
+  var cs=document.getElementById("cloneSteps"), ci=document.getElementById("cloneInfo");
+  steps.forEach(function(s,i){
+    var b=document.createElement("button"); b.type="button";
+    b.innerHTML='<span class="mono">Solis '+(i+1)+'</span>'+s[0];
+    b.addEventListener("click",function(){
+      cs.querySelectorAll("button").forEach(function(x){ x.setAttribute("aria-pressed","false"); });
+      b.setAttribute("aria-pressed","true"); ci.textContent=s[1];
+    });
+    cs.appendChild(b);
+    if(i===0){ b.setAttribute("aria-pressed","true"); ci.textContent=s[1]; }
+  });
+
+  /* PCR */
+  var pcr=document.getElementById("pcr");
+  function pcrUpdate(){
+    var n=+pcr.value, c=Math.pow(2,n);
+    document.getElementById("pcrN").textContent=n;
+    document.getElementById("pcrOut").textContent=c.toLocaleString("lv-LV");
+    document.getElementById("pcrT").textContent="2^"+n;
+  }
+  pcr.addEventListener("input",pcrUpdate); pcrUpdate();
+
+  /* CRISPR sites */
+  var sites=document.querySelectorAll("#sites .site"), sfb=document.getElementById("siteFb");
+  sites.forEach(function(s){
+    s.addEventListener("click",function(){
+      var ok=s.dataset.ok==="1";
+      sites.forEach(function(x){ x.classList.remove("ok","no"); });
+      s.classList.add(ok?"ok":"no");
+      sfb.textContent=ok
+        ? "Pareizi. Vieta B beidzas ar TGG, kas atbilst NGG signālam. Cas9 var griezt apmēram trīs nukleotīdus pirms tā."
+        : "Nē. Vietai A seko CTA, kas neatbilst NGG. Bez PAM Cas9 šo mērķi negriezīs, kaut arī secība būtu pareiza.";
+    });
+  });
+  document.querySelectorAll("#sites .seq b").forEach(function(b){ b.className="pam"; });
+
+  /* growth phases */
+  var phases=[
+    ["lag","Adaptācijas fāze","Šūnas pielāgojas barotnei, gatavo enzīmus. Skaits gandrīz nemainās."],
+    ["log","Eksponenciālā fāze","Šūnas dalās visātrāk, un skaits strauji aug. Bieži šajā fāzē veidojas pamatprodukti, kas saistīti ar augšanu."],
+    ["sta","Stacionārā fāze","Jaunu šūnu rodas tikpat, cik atmirst, jo barības vielas izsīkst un uzkrājas atkritumvielas. Daži produkti, piemēram, antibiotikas, veidojas tieši tagad."],
+    ["dea","Atmiršanas fāze","Šūnu skaits samazinās, jo nepietiek barības vielu un vide kļūst nelabvēlīga."]
+  ];
+  var pw=document.getElementById("phases"), pinfo=document.getElementById("phaseInfo");
+  function setPhase(k){
+    phases.forEach(function(p){ document.getElementById("ph-"+p[0]).setAttribute("opacity",p[0]===k?"1":"0"); });
+    pw.querySelectorAll("button").forEach(function(b){ b.setAttribute("aria-pressed",b.dataset.k===k); });
+    var p=phases.filter(function(x){return x[0]===k;})[0]; pinfo.innerHTML="<b>"+p[1]+".</b> "+p[2];
+  }
+  phases.forEach(function(p){
+    var b=document.createElement("button"); b.type="button"; b.dataset.k=p[0]; b.textContent=p[1];
+    b.addEventListener("click",function(){ setPhase(p[0]); }); pw.appendChild(b);
+  });
+  setPhase("log");
+
+  /* quiz */
+  var Q=[
+    {ch:"n1",q:"Kuras jomas pārstāv zaļā biotehnoloģija?",o:["Medicīnu un zāļu ražošanu","Lauksaimniecību","Rūpniecisko fermentāciju","Jūras resursu izmantošanu"],a:1,e:"Zaļā biotehnoloģija saistīta ar lauksaimniecību: kultūraugiem, augu aizsardzību un augsnes mikroorganismiem."},
+    {ch:"n2",q:"Kādu lomu gēnu inženierijā pilda restrikcijas enzīmi?",o:["Savieno DNS gabalus","Pavairo DNS PCR laikā","Pārgriež DNS noteiktās secībās","Nodrošina baktērijas ar enerģiju"],a:2,e:"Restrikcijas enzīmi ir „molekulārās šķēres”. DNS savieno ligāze."},
+    {ch:"n2",q:"Kā mūsdienās ražo cilvēka insulīnu?",o:["Iegūst no cūku aizkuņģa dziedzera","Baktērijas vai raugs ar ievadītu cilvēka insulīna gēnu","Sintezē tikai ar tīru ķīmiju bez šūnām","Iegūst no cilvēka asinīm"],a:1,e:"Rekombinantais insulīns rodas, kad baktērijām vai raugam ievada cilvēka insulīna gēnu."},
+    {ch:"n2",q:"Ja PCR sākumā ir 1 mērķa molekula, cik to ideālā gadījumā būs pēc 10 cikliem?",o:["20","100","1024","10 000"],a:2,e:"Katrā ciklā skaits dubultojas: 2^10 = 1024."},
+    {ch:"n3",q:"Kas ir nepieciešams blakus mērķim, lai Cas9 varētu griezt?",o:["PAM secība","Plazmīda","Restrikcijas vieta","Ligāze"],a:0,e:"Cas9 griež tikai tad, ja mērķim blakus ir PAM (NGG biežāk lietotajam Cas9)."},
+    {ch:"n3",q:"Kāds ir vadošās RNS uzdevums?",o:["Pārgriež DNS","Savieno DNS galus pēc griezuma","Aizved Cas9 uz mērķa secību","Pavairo šūnas"],a:2,e:"Vadošā RNS atbilst mērķa secībai un aizved Cas9 uz pareizo vietu. Griež pats Cas9."},
+    {ch:"n4",q:"Kas ir iPSC šūnas?",o:["Embriju šūnas no donora","Pieaugušas šūnas, kas pārprogrammētas pluripotentā stāvoklī","Baktēriju šūnas ar plazmīdu","Mākslīgi sintezētas šūnas bez DNS"],a:1,e:"iPSC rodas, pārprogrammējot pieaugušu šūnu, piemēram, ādas šūnu."},
+    {ch:"n5",q:"Kurā augšanas fāzē mikroorganismu skaits aug visstraujāk?",o:["Adaptācijas fāzē","Eksponenciālajā fāzē","Stacionārajā fāzē","Atmiršanas fāzē"],a:1,e:"Eksponenciālajā fāzē šūnas dalās ātri un skaits strauji palielinās."},
+    {ch:"n5",q:"Kāpēc bioreaktorā uzrauga pH un šķīdināto skābekli?",o:["Lai bioreaktors izskatītos tīrs","Tie ietekmē šūnu augšanu un produkta veidošanos","Lai šūnas apturētu dalīšanos","Tie nav svarīgi"],a:1,e:"Šie parametri tieši ietekmē šūnu veselību un produkta iznākumu, tāpēc tos uztur noteiktās robežās."},
+    {ch:"n6",q:"Ar ko dzimumšūnu rediģēšana atšķiras no somatiskās?",o:["Tā vienmēr ir lētāka","Izmaiņas var tikt mantotas pēcnācējiem","Tā neizmanto DNS","Tā ir atļauta visās valstīs"],a:1,e:"Dzimumšūnu izmaiņas var nodoties nākamajām paaudzēm, tāpēc par to ir daudz nopietnāka diskusija."}
+  ];
+  var titles={n1:"Kas ir biotehnoloģija",n2:"Gēnu inženierija",n3:"CRISPR-Cas9",n4:"Šūnas un audi",n5:"Rūpnieciskā biotehnoloģija",n6:"Ētika un drošība"};
+  var quizStarted=false, qi=0, score=0, wrong=[];
+  var root=document.getElementById("quizRoot");
+  function startQuiz(){
+    quizStarted=true; qi=0; score=0; wrong=[];
+    root.innerHTML=''+
+      '<p class="lead">10 jautājumi par visām nodaļām. Pēc katras atbildes uzreiz redzēsi paskaidrojumu.</p>'+
+      '<button class="btn" id="qgo" type="button">Sākt testu</button>';
+    document.getElementById("qgo").addEventListener("click",renderQ);
+  }
+  function renderQ(){
+    var q=Q[qi], letters=["A","B","C","D"];
+    var html='<div class="qmeta"><span>Jautājums '+(qi+1)+' / '+Q.length+'</span><span>Rezultāts: '+score+'</span></div>'+
+      '<div class="bar"><i style="width:'+(qi/Q.length*100)+'%"></i></div>'+
+      '<p class="qtext" style="margin-top:20px">'+q.q+'</p><div class="opts">';
+    q.o.forEach(function(t,i){ html+='<button type="button" class="opt" data-i="'+i+'"><span class="k">'+letters[i]+'</span><span>'+t+'</span></button>'; });
+    html+='</div><div id="qexp" aria-live="polite"></div>';
+    root.innerHTML=html;
+    root.querySelectorAll(".opt").forEach(function(b){
+      b.addEventListener("click",function(){ answer(+b.dataset.i); });
+    });
+  }
+  function answer(i){
+    var q=Q[qi], ok=(i===q.a);
+    if(ok) score++; else wrong.push(q.ch);
+    root.querySelectorAll(".opt").forEach(function(b,j){
+      b.disabled=true;
+      if(j===q.a) b.classList.add("ok"); else if(j===i) b.classList.add("no");
+    });
+    var last=(qi===Q.length-1);
+    document.getElementById("qexp").innerHTML=
+      '<div class="expl"><b>'+(ok?"Pareizi. ":"Nepareizi. ")+'</b>'+q.e+'</div>'+
+      '<button class="btn" id="qnext" type="button">'+(last?"Skatīt rezultātu":"Nākamais jautājums")+'</button>';
+    var nb=document.getElementById("qnext"); nb.focus();
+    nb.addEventListener("click",function(){ if(last) result(); else { qi++; renderQ(); } });
+  }
+  function result(){
+    var pct=Math.round(score/Q.length*100), msg;
+    if(score>=9) msg="Teicami. Tu labi apguvi materiālu.";
+    else if(score>=7) msg="Labi. Pāris tēmas vērts atkārtot.";
+    else if(score>=5) msg="Pamati ir, bet vēl vajag atkārtot vairākas nodaļas.";
+    else msg="Vērts vēlreiz izlasīt nodaļas un pamēģināt testu atkārtoti.";
+    var uniq=wrong.filter(function(v,i,a){return a.indexOf(v)===i;});
+    var rev=uniq.length?'<p>Atkārto šīs nodaļas:</p><div class="review">'+uniq.map(function(c){return '<a href="#'+c+'">'+titles[c]+'</a>';}).join("")+'</div>':'<p>Kļūdu nebija, atkārtot nav ko.</p>';
+    root.innerHTML='<div class="qmeta"><span>Rezultāts</span></div><div class="score">'+score+'/'+Q.length+'</div>'+
+      '<p style="margin-top:10px"><b>'+pct+' %.</b> '+msg+'</p>'+rev+
+      '<button class="btn" id="qagain" type="button">Mēģināt vēlreiz</button>';
+    document.getElementById("qagain").addEventListener("click",function(){ startQuiz(); renderQ(); });
+  }
+
+  updateProgress();
+  show("n1");
+})();
+</script>
